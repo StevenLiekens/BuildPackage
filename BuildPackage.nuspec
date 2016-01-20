@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <package >
-  <metadata>
+  <metadata minClientVersion="2.8">
     <id>BuildPackage</id>
+    <developmentDependency>true</developmentDependency>
     <version>1.0.0</version>
     <authors>Steven Liekens</authors>
     <owners>Steven Liekens</owners>
@@ -15,4 +16,7 @@
       <dependency id="NuGet.CommandLine" version="3.3.0" />
     </dependencies>
   </metadata>
+  <files>
+    <file src="build\*" target="build" />
+  </files>
 </package>
