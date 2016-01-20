@@ -1,0 +1,26 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BuildDependsOn>$(BuildDependsOn);BuildPackage</BuildDependsOn>
+  </PropertyGroup>
+  <Target Name="BuildPackage" DependsOnTargets="BuildPackageCore" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
+  <Target Name="BuildPackageCore">
+    <PropertyGroup>
+      <!-- Escape the OutDir's trailing slash -->
+      <_PackagesOutDir Condition="HasTrailingSlash('$(OutDir)')">"$(OutDir)\"</_PackagesOutDir>
+      <_PackagesOutDir Condition="!HasTrailingSlash('$(OutDir)')">"$(OutDir)\\"</_PackagesOutDir>
+    </PropertyGroup>
+    <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="$(NuGetToolPath) pack &quot;$(MSBuildProjectFile)&quot; -Symbols -IncludeReferencedProjects -OutputDirectory $(_PackagesOutDir) -Properties Configuration=$(Configuration)">
+      <Output TaskParameter="ConsoleOutput" ItemName="_out" />
+    </Exec>
+    <PropertyGroup>
+      <_Pattern><![CDATA[Successfully created package '(?<package>.+)'.]]></_Pattern>
+    </PropertyGroup>
+    <ItemGroup>
+      <_Matches Include="$([System.Text.RegularExpressions.Regex]::Match('%(_out.Identity)', '$(_Pattern)').Groups['package'].Value)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(_out.Identity)', '$(_Pattern)'))" />
+    </ItemGroup>
+    <PropertyGroup>
+      <Packages>@(_Matches->'%(FullPath)')</Packages>
+    </PropertyGroup>
+    <WriteLinesToFile Lines="$(Packages)" File="$(IntermediateOutputPath)$(CleanFile)" />
+  </Target>
+</Project>
