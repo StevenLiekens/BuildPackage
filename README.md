@@ -1,5 +1,5 @@
 # BuildPackage
-Sources for the BuildPackage package.
+![nuget](https://img.shields.io/nuget/v/BuildPackage.svg)
 
 # How To
 Install the package directly into the project that must be packaged using the package manager GUI or console.
