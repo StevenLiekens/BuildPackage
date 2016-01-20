@@ -14,6 +14,12 @@ Powershell:
 Install-Package BuildPackage
 ```
 
+Edit the packages.config file to indicate that this package is not required to run your app by marking it as a `developmentDependency`.
+```xml
+<package id="BuildPackage" version="1.0.0" targetFramework="net40" developmentDependency="true" />
+<package id="NuGet.CommandLine" version="3.3.0" targetFramework="net40" developmentDependency="true" />
+```
+
 That's it! That's all you have to do. The next time you build your project, an extra build step will run `nuget.exe pack` on your project file. The script supports incremental building and cleaning, too!
 
 # Advanced Features
