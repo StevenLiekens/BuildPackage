@@ -22,11 +22,31 @@ Edit the packages.config file to indicate that this package is not required to r
 
 That's it! That's all you have to do. The next time you build your project, an extra build step will run `nuget.exe pack` on your project file. The script supports incremental building and cleaning, too!
 
-# Advanced Features
- - Enable/Disable packaging outputs
- - Override path to nuget.exe
+# Limitations
 
-## Enabling/Disabling
+The `BuildPackage` build target runs after the `AfterBuild` target. All build artifacts in project's `$(OutDir)` are packaged on every build. There are some limitations to this approach.
+
+ - It's not possible to create a single package that contains multiple build configurations.
+ - Build artifacts from referenced projects are included in the package.
+   - Workaround 1: add a nuspec file and customize its `<files>` and `<dependencies>` sections. Recommended, especially if your package depends on other NuGet packages.
+   - Workaround 2: disable "Copy Local" for references that should not be included in the package. Not recommended.
+
+# Advanced Features
+ - Organize package contents
+ - Enable/Disable BuildPackage
+ - Override path to NuGet.exe
+ 
+## Organize Package Contents
+You can add a build step that organizes the output directory before building the package.
+
+MSBuild:
+```xml
+<Target Name="AfterBuild">
+	<!-- Copy, move or delete files to create the perfect package -->
+</Target>
+```
+
+## Enable/Disable BuildPackage
 You can enable or disable packaging by setting the value of an MSBuild property named `BuildPackage` to `False`. You can do this at the project level or at the build configuration level.
 
 MSBuild:
@@ -60,7 +80,7 @@ CMD:
 MSBuild MySolution.sln /p:BuildPackage=False
 ```
 
-## Custom Tool Path
+## Override Path to NuGet.exe
 The build script will try to find NuGet.exe somewhere in your project's `packages` folder. You can override this behavior by setting an MSBuild variable named `NuGetToolPath`.
 
 MSBuild:
