@@ -9,7 +9,7 @@
       <_PackagesOutDir Condition="HasTrailingSlash('$(OutDir)')">"$(OutDir)\"</_PackagesOutDir>
       <_PackagesOutDir Condition="!HasTrailingSlash('$(OutDir)')">"$(OutDir)\\"</_PackagesOutDir>
     </PropertyGroup>
-    <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="$(NuGetToolPath) pack &quot;$(MSBuildProjectFile)&quot; -Symbols -IncludeReferencedProjects -OutputDirectory $(_PackagesOutDir) -Properties Configuration=$(Configuration)">
+    <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="&quot;$(NuGetToolPath)&quot; pack &quot;$(MSBuildProjectFile)&quot; -Symbols -IncludeReferencedProjects -OutputDirectory $(_PackagesOutDir) -Properties Configuration=$(Configuration)">
       <Output TaskParameter="ConsoleOutput" ItemName="_out" />
     </Exec>
     <PropertyGroup>
