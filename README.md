@@ -33,7 +33,7 @@ The script supports incremental building and cleaning. Packages that are created
 To get the best results, add a customized nuspec file to each project that you will package this way. More information: https://docs.nuget.org/create/nuspec-reference
 
 # Behind the Scenes
-Upon installation, NuGet adds imports to the custom build targets in this package to your project file. The imported targets file contain self-bootstrapping code to ensure that the `BuildPackage` target is executed when you build your project. It does this by extending MSBuild's `BuildDependsOn` property.
+Upon installation, NuGet adds imports for the custom build targets in this package to your project file. The imported targets file contain self-bootstrapping code to ensure that the `BuildPackage` target is executed when you build your project. It does this by extending MSBuild's `BuildDependsOn` property.
 
 ```xml
 <BuildDependsOn>$(BuildDependsOn);BuildPackage</BuildDependsOn>
