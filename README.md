@@ -1,4 +1,6 @@
 # BuildPackage
+
+[![Join the chat at https://gitter.im/StevenLiekens/BuildPackage](https://badges.gitter.im/StevenLiekens/BuildPackage.svg)](https://gitter.im/StevenLiekens/BuildPackage?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![NuGet badge](https://img.shields.io/nuget/v/BuildPackage.svg)
 
 https://www.nuget.org/packages/BuildPackage/
