@@ -82,8 +82,8 @@ Build artifacts are packaged on every build. There are some limitations to this 
  - Package dependencies
  - Organize package contents
  - Override path to NuGet.exe
- 
- ## Enable/Disable BuildPackage
+
+## Enable/Disable BuildPackage
 You can enable or disable packaging by setting the value of an MSBuild property named `BuildPackage` to `False`. You can do this at the project level or at the build configuration level.
 
 MSBuild:
@@ -161,6 +161,8 @@ msbuild MySolution.sln
 TIP: you can set `NuGetToolPath` to `NuGet.exe` if it is available on your `PATH`.
 
 # MSBuild Parameter Reference
+Most (but not all) NuGet command line options can be customized by setting the value of a corresponding MSBuild property.
+
 | Property                              | Value                                                |
 | ------------------------------------- | ---------------------------------------------------- |
 | BuildPackage                          | Boolean. Default: True.                              |
@@ -179,3 +181,5 @@ TIP: you can set `NuGetToolPath` to `NuGet.exe` if it is available on your `PATH
 | BuildPackageDetailed                  | Boolean.                                             |
 | BuildPackageMinClientVersion          | String. (semver)                                     |
 | BuildPackageMSBuildVersion            | Number. (4, 12 or 14)                                |
+
+More information: https://docs.nuget.org/consume/command-line-reference#pack-command-options
