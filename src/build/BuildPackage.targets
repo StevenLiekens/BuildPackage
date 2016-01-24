@@ -37,8 +37,8 @@
       <NugetPackCommand Condition=" '$(BuildPackageAdditionalProperties)' != '' ">$(NugetPackCommand);$(BuildPackageAdditionalProperties)</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageDetailed)' == 'True' ">$(NugetPackCommand) -Verbosity detailed</NugetPackCommand>
       <NugetPackCommand>$(NugetPackCommand) -NonInteractive</NugetPackCommand>
-      <NugetPackCommand Condition=" '$(BuildPackageMinClientVersion)' == 'True' ">$(NugetPackCommand) -MinClientVersion $(BuildPackageMinClientVersion)</NugetPackCommand>
-      <NugetPackCommand Condition=" '$(BuildPackageMSBuildVersion)' == 'True' ">$(NugetPackCommand) -MSBuildVersion $(BuildPackageMSBuildVersion)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageMinClientVersion)' != '' ">$(NugetPackCommand) -MinClientVersion $(BuildPackageMinClientVersion)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageMSBuildVersion)' != '' ">$(NugetPackCommand) -MSBuildVersion $(BuildPackageMSBuildVersion)</NugetPackCommand>
       <NugetPackCommand Condition=" '$(OsEnvironment)' == 'Unix' ">mono $(NugetPackCommand)</NugetPackCommand>
     </PropertyGroup>
     <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="$(NugetPackCommand)">
