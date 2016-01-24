@@ -1,10 +1,5 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Condition=" '$(NuGetToolPath)' == '' ">
-    <!-- TODO: Handle multiple versions of the command tools -->
-    <_exe Include="$(MSBuildThisFileDirectory)..\..\NuGet.CommandLine*\tools\NuGet.exe" />
-  </ItemGroup>
   <PropertyGroup>
     <BuildPackage Condition=" '$(BuildPackage)' == '' ">True</BuildPackage>
-    <NuGetToolPath Condition=" '$(NuGetToolPath)' == '' ">@(_exe->'%(FullPath)')</NuGetToolPath>
   </PropertyGroup>
 </Project>

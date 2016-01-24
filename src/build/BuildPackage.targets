@@ -4,7 +4,11 @@
   </PropertyGroup>
   <Target Name="BuildPackage" DependsOnTargets="BuildPackageCore" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
   <Target Name="BuildPackageCore">
+    <ItemGroup Condition=" '$(NuGetToolPath)' == '' ">
+      <_exe Include="$(MSBuildThisFileDirectory)..\..\NuGet.CommandLine*\tools\NuGet.exe" />
+    </ItemGroup>
     <PropertyGroup>
+      <NuGetToolPath Condition=" '$(NuGetToolPath)' == '' ">%(_exe.FullPath)</NuGetToolPath>
       <!-- Escape the OutDir's trailing slash -->
       <_PackagesOutDir Condition="HasTrailingSlash('$(OutDir)')">"$(OutDir)\"</_PackagesOutDir>
       <_PackagesOutDir Condition="!HasTrailingSlash('$(OutDir)')">"$(OutDir)\\"</_PackagesOutDir>
