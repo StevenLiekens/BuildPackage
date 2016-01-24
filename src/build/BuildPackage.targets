@@ -2,18 +2,46 @@
   <PropertyGroup>
     <BuildDependsOn>$(BuildDependsOn);BuildPackage</BuildDependsOn>
   </PropertyGroup>
-  <Target Name="BuildPackage" DependsOnTargets="BuildPackageCore" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
-  <Target Name="BuildPackageCore">
+  <Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
+  <Target Name="CoreBuildPackage">
     <ItemGroup Condition=" '$(NuGetToolPath)' == '' ">
       <_exe Include="$(MSBuildThisFileDirectory)..\..\NuGet.CommandLine*\tools\NuGet.exe" />
     </ItemGroup>
-    <PropertyGroup>
-      <NuGetToolPath Condition=" '$(NuGetToolPath)' == '' ">%(_exe.FullPath)</NuGetToolPath>
-      <!-- Escape the OutDir's trailing slash -->
-      <_PackagesOutDir Condition="HasTrailingSlash('$(OutDir)')">"$(OutDir)\"</_PackagesOutDir>
-      <_PackagesOutDir Condition="!HasTrailingSlash('$(OutDir)')">"$(OutDir)\\"</_PackagesOutDir>
+    <PropertyGroup Condition=" '$(BuildPackageTool)' == '' ">
+      <BuildPackageTool Condition=" '$(OutputType)' == 'Exe' " >True</BuildPackageTool>
+      <BuildPackageTool Condition=" '$(OutputType)' == 'Winexe' " >True</BuildPackageTool>
     </PropertyGroup>
-    <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="&quot;$(NuGetToolPath)&quot; pack &quot;$(MSBuildProjectFile)&quot; -Symbols -IncludeReferencedProjects -OutputDirectory $(_PackagesOutDir) -Properties Configuration=$(Configuration)">
+    <PropertyGroup Condition=" '$(NuGetToolPath)' == '' ">
+      <NuGetToolPath>%(_exe.FullPath)</NuGetToolPath>
+    </PropertyGroup>
+    <PropertyGroup>
+      <NugetPackCommand>&quot;$(NuGetToolPath)&quot;</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) pack</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) &quot;$(MSBuildProjectFile)&quot;</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) -OutputDirectory</NugetPackCommand>
+      <!-- Escape the OutDir's trailing slash -->
+      <NugetPackCommand Condition="HasTrailingSlash('$(OutDir)')">$(NugetPackCommand)  &quot;$(OutDir)\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition="!HasTrailingSlash('$(OutDir)')">$(NugetPackCommand) &quot;$(OutDir)\\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageBasePath)' != '' And HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageBasePath)' != '' And !HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageVersion)' != '' ">$(NugetPackCommand) -Version $(BuildPackageVersion)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageExclude)' != '' ">$(NugetPackCommand) -Exclude $(BuildPackageExclude)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageSymbols)' == 'True' ">$(NugetPackCommand) -Symbols</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageTool)' == 'True' ">$(NugetPackCommand) -Tool</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageNoDefaultExcludes)' == 'True' ">$(NugetPackCommand) -NoDefaultExcludes</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageNoPackageAnalysis)' == 'True' ">$(NugetPackCommand) -NoPackageAnalysis</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageIncludeReferencedProjects)' == 'True' ">$(NugetPackCommand) -IncludeReferencedProjects</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageExcludeEmptyDirectories)' == 'True' ">$(NugetPackCommand) -ExcludeEmptyDirectories</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageProperties)' == '' ">$(NugetPackCommand) -Properties Configuration=$(Configuration)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageProperties)' != '' ">$(NugetPackCommand) -Properties $(BuildPackageProperties)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageAdditionalProperties)' != '' ">$(NugetPackCommand);$(BuildPackageAdditionalProperties)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageDetailed)' == 'True' ">$(NugetPackCommand) -Verbosity detailed</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) -NonInteractive</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageMinClientVersion)' == 'True' ">$(NugetPackCommand) -MinClientVersion $(BuildPackageMinClientVersion)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(BuildPackageMSBuildVersion)' == 'True' ">$(NugetPackCommand) -MSBuildVersion $(BuildPackageMSBuildVersion)</NugetPackCommand>
+      <NugetPackCommand Condition=" '$(OsEnvironment)' == 'Unix' ">mono $(NugetPackCommand)</NugetPackCommand>
+    </PropertyGroup>
+    <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="$(NugetPackCommand)">
       <Output TaskParameter="ConsoleOutput" ItemName="_out" />
     </Exec>
     <PropertyGroup>

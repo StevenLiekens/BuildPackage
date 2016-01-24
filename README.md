@@ -47,16 +47,19 @@ In a typical project, this evaluates to the following sequence of build targets:
  3. AfterBuild
  4. BuildPackage
 
-The `BuildPackage` target itself depends on another target: `BuildPackageCore`.
+The `BuildPackage` target itself depends on three other targets:
+ 1. BeforeBuildPackage
+ 2. CoreBuildPackage
+ 3. AfterBuildPackage
 
 ```xml
-<Target Name="BuildPackage" DependsOnTargets="BuildPackageCore" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
-<Target Name="BuildPackageCore">
+<Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
+<Target Name="CoreBuildPackage">
 ...
 </Target>
 ```
 
-This is where the magic happens. When executed, the `BuildPackageCore` target finds `NuGet.exe` somewhere in your packages folder, then executes `NuGet.exe pack` on your project file.
+When executed, the `CoreBuildPackage` target finds `NuGet.exe` somewhere in your packages folder, then executes `NuGet.exe pack` on your project file. The other targets (BeforeBuildPackage, AfterBuildPackage) are extensibility points that you can override.
 
 The full command line looks like this:
 ```sh
@@ -75,37 +78,12 @@ For every regex match that is found in the output, a line is added to the FileLi
 Build artifacts are packaged on every build. There are some limitations to this approach. It's not possible to create a single package that contains multiple build configurations. This is a showstopper for cross-platform development where targeting multiple platforms requires rebuilding with different compiler options. This limiation does not apply to Portable Class Libraries (PCL) if used correctly.
 
 # Advanced Features
+ - Enable/Disable BuildPackage
  - Package dependencies
  - Organize package contents
- - Enable/Disable BuildPackage
  - Override path to NuGet.exe
-
-## Package Dependencies
-Packages are built with the `-IncludeReferencedProjects` option. You can customize the nuspec file of the project file and each referenced project to control how this option behaves.
-
-From docs.nuget.org:
- > If a referenced project has a corresponding nuspec file that has the same name as the project, then that referenced project is added as a dependency. Otherwise, the referenced project is added as part of the package.
  
-## Organize Package Contents
-You can add a build step that exectutes before building the package. This option was added to support convention based working directories.
-
-MSBuild:
-```xml
-<Target Name="AfterBuild">
-  <!--
-    Copy, move or delete files to turn $(OutDir) into a convention based working directory
-    Task reference: https://msdn.microsoft.com/en-us/library/7z253716.aspx
-    Conventions: https://docs.nuget.org/create/creating-and-publishing-a-package#from-a-convention-based-working-directory
-  -->
-  <ItemGroup>
-    <Images Include="$(OutDir)*.jpg" />
-  </ItemGroup>
-  <MakeDir Directories="$(OutDir)content\images\" />
-  <Move SourceFiles="@(Images)" DestinationFolder="$(OutDir)content\images\" />
-</Target>
-```
-
-## Enable/Disable BuildPackage
+ ## Enable/Disable BuildPackage
 You can enable or disable packaging by setting the value of an MSBuild property named `BuildPackage` to `False`. You can do this at the project level or at the build configuration level.
 
 MSBuild:
@@ -124,7 +102,7 @@ MSBuild:
 </PropertyGroup>
 ```
 
-You can also set it at the solution level by setting an environment variable.
+You can also set it at the solution level by setting an environment variable or by passing it as a parameter to MSBuild on the command line.
 
 CMD:
 ```
@@ -132,12 +110,37 @@ SET BuildPackage=False
 MSBuild MySolution.sln
 ```
 
-Or you can explicitly pass it as a parameter.
-
 CMD:
 ```
 MSBuild MySolution.sln /p:BuildPackage=False
 ```
+
+## Package Dependencies
+Packages are built with the `-IncludeReferencedProjects` option. You can customize the nuspec file of the project file and each referenced project to control how this option behaves.
+
+From docs.nuget.org:
+ > If a referenced project has a corresponding nuspec file that has the same name as the project, then that referenced project is added as a dependency. Otherwise, the referenced project is added as part of the package.
+ 
+## Organize Package Contents
+You can add a build step that exectutes before building the package. This option was added to support convention based working directories. **This option breaks incremental building and cleaning**.
+
+MSBuild:
+```xml
+<Target Name="BeforeBuildPackage">
+  <!--
+    Copy, move or delete files to turn $(OutDir) into a convention based working directory
+    Task reference: https://msdn.microsoft.com/en-us/library/7z253716.aspx
+    Conventions: https://docs.nuget.org/create/creating-and-publishing-a-package#from-a-convention-based-working-directory
+  -->
+  <ItemGroup>
+    <Images Include="$(OutDir)*.jpg" />
+  </ItemGroup>
+  <MakeDir Directories="$(OutDir)content\images\" />
+  <Move SourceFiles="@(Images)" DestinationFolder="$(OutDir)content\images\" />
+</Target>
+```
+
+
 
 ## Override Path to NuGet.exe
 The build script will try to find NuGet.exe somewhere in your project's `packages` folder. You can override this behavior by setting an MSBuild variable named `NuGetToolPath`.
@@ -156,3 +159,23 @@ msbuild MySolution.sln
 ```
 
 TIP: you can set `NuGetToolPath` to `NuGet.exe` if it is available on your `PATH`.
+
+# MSBuild Parameter Reference
+| Property                              | Value                                                |
+| ------------------------------------- | ---------------------------------------------------- |
+| BuildPackage                          | Boolean. Default: True.                              |
+| NuGetToolPath                         | String. (file)                                       |
+| BuildPackageBasePath                  | String. (directory)                                  |
+| BuildPackageVersion                   | String. (semver)                                     |
+| BuildPackageExclude                   | String. (glob)                                       |
+| BuildPackageSymbols                   | Boolean. Default: True.                              |
+| BuildPackageTool                      | Boolean. Default: True for console and windows apps. |
+| BuildPackageNoDefaultExcludes         | Boolean.                                             |
+| BuildPackageNoPackageAnalysis         | Boolean.                                             |
+| BuildPackageIncludeReferencedProjects | Boolean. Default: True.                              |
+| BuildPackageExcludeEmptyDirectories   | Boolean.                                             |
+| BuildPackageProperties                | String. Default: Configuration=$(Configuration)      |
+| BuildPackageAdditionalProperties      | String.                                              |
+| BuildPackageDetailed                  | Boolean.                                             |
+| BuildPackageMinClientVersion          | String. (semver)                                     |
+| BuildPackageMSBuildVersion            | Number. (4, 12 or 14)                                |
