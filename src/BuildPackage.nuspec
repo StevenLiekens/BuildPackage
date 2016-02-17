@@ -3,7 +3,7 @@
   <metadata minClientVersion="2.8">
     <id>BuildPackage</id>
     <developmentDependency>true</developmentDependency>
-    <version>1.0.3</version>
+    <version>1.0.6</version>
     <authors>Steven Liekens</authors>
     <owners>Steven Liekens</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,7 +11,7 @@
     <licenseUrl>https://raw.githubusercontent.com/StevenLiekens/BuildPackage/master/LICENSE</licenseUrl>
     <summary>Build NuGet packages the easy way</summary>
     <description>By installing this package into a project, the project build is extended with a build step that creates NuGet packages.</description>
-    <releaseNotes>https://github.com/StevenLiekens/BuildPackage/releases/tag/v1.0.3</releaseNotes>
+    <releaseNotes>https://github.com/StevenLiekens/BuildPackage/releases/tag/v1.0.6</releaseNotes>
     <copyright>The MIT License (MIT)</copyright>
     <dependencies>
       <dependency id="NuGet.CommandLine" version="3.3.0" />
