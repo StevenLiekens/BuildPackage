@@ -14,16 +14,20 @@
     <PropertyGroup Condition=" '$(NuGetToolPath)' == '' ">
       <NuGetToolPath>%(_exe.FullPath)</NuGetToolPath>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(BuildPackageOutputDirectory)' == '' ">
+        <BuildPackageOutputDirectory>$(OutDir)</BuildPackageOutputDirectory>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(BuildPackageBasePath)' == '' ">
+      <BuildPackageBasePath>$(OutDir)</BuildPackageBasePath>
+    </PropertyGroup>
     <PropertyGroup>
       <NugetPackCommand>&quot;$(NuGetToolPath)&quot;</NugetPackCommand>
-      <NugetPackCommand>$(NugetPackCommand) pack</NugetPackCommand>
-      <NugetPackCommand>$(NugetPackCommand) &quot;$(MSBuildProjectFile)&quot;</NugetPackCommand>
-      <NugetPackCommand>$(NugetPackCommand) -OutputDirectory</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) pack &quot;$(MSBuildProjectFile)&quot;</NugetPackCommand>
       <!-- Escape the OutDir's trailing slash -->
-      <NugetPackCommand Condition="HasTrailingSlash('$(OutDir)')">$(NugetPackCommand)  &quot;$(OutDir)\&quot;</NugetPackCommand>
-      <NugetPackCommand Condition="!HasTrailingSlash('$(OutDir)')">$(NugetPackCommand) &quot;$(OutDir)\\&quot;</NugetPackCommand>
-      <NugetPackCommand Condition=" '$(BuildPackageBasePath)' != '' And HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\&quot;</NugetPackCommand>
-      <NugetPackCommand Condition=" '$(BuildPackageBasePath)' != '' And !HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition="HasTrailingSlash('$(BuildPackageOutputDirectory)')">$(NugetPackCommand) -OutputDirectory &quot;$(BuildPackageOutputDirectory)\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition="!HasTrailingSlash('$(BuildPackageOutputDirectory)')">$(NugetPackCommand) -OutputDirectory &quot;$(BuildPackageOutputDirectory)\\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition="HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\&quot;</NugetPackCommand>
+      <NugetPackCommand Condition="!HasTrailingSlash('$(BuildPackageBasePath)')">$(NugetPackCommand) -BasePath &quot;$(BuildPackageBasePath)\\&quot;</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageVersion)' != '' ">$(NugetPackCommand) -Version $(BuildPackageVersion)</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageExclude)' != '' ">$(NugetPackCommand) -Exclude $(BuildPackageExclude)</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageSymbols)' == 'True' ">$(NugetPackCommand) -Symbols</NugetPackCommand>

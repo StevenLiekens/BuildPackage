@@ -163,23 +163,24 @@ TIP: you can set `NuGetToolPath` to `NuGet.exe` if it is available on your `PATH
 # MSBuild Parameter Reference
 Most (but not all) NuGet command line options can be customized by setting the value of a corresponding MSBuild property.
 
-| Property                              | Value                                                |
-| ------------------------------------- | ---------------------------------------------------- |
-| BuildPackage                          | Boolean. Default: True.                              |
-| NuGetToolPath                         | String. (file)                                       |
-| BuildPackageBasePath                  | String. (directory)                                  |
-| BuildPackageVersion                   | String. (semver)                                     |
-| BuildPackageExclude                   | String. (glob)                                       |
-| BuildPackageSymbols                   | Boolean. Default: True.                              |
-| BuildPackageTool                      | Boolean. Default: True for console and windows apps. |
-| BuildPackageNoDefaultExcludes         | Boolean.                                             |
-| BuildPackageNoPackageAnalysis         | Boolean.                                             |
-| BuildPackageIncludeReferencedProjects | Boolean. Default: True.                              |
-| BuildPackageExcludeEmptyDirectories   | Boolean.                                             |
-| BuildPackageProperties                | String. Default: Configuration=$(Configuration)      |
-| BuildPackageAdditionalProperties      | String.                                              |
-| BuildPackageDetailed                  | Boolean.                                             |
-| BuildPackageMinClientVersion          | String. (semver)                                     |
-| BuildPackageMSBuildVersion            | Number. (4, 12 or 14)                                |
+| Property                              | Pack command option       | Value                                                |
+| ------------------------------------- | ------------------------- | ---------------------------------------------------- |
+| BuildPackage                          |                           | Boolean. Default: True.                              |
+| NuGetToolPath                         |                           | String. (file)                                       |
+| BuildPackageOutputDirectory           | OutputDirectory           | String. Default: $(OutDir)                           |
+| BuildPackageBasePath                  | BasePath                  | String. Default: $(OutDir)                           |
+| BuildPackageVersion                   | Version                   | String. (semver)                                     |
+| BuildPackageExclude                   | Exclude                   | String. (glob)                                       |
+| BuildPackageSymbols                   | Symbols                   | Boolean. Default: True.                              |
+| BuildPackageTool                      | Tool                      | Boolean. Default: True for console and windows apps. |
+| BuildPackageNoDefaultExcludes         | NoDefaultExcludes         | Boolean.                                             |
+| BuildPackageNoPackageAnalysis         | NoPackageAnalysis         | Boolean.                                             |
+| BuildPackageIncludeReferencedProjects | IncludeReferencedProjects | Boolean. Default: True.                              |
+| BuildPackageExcludeEmptyDirectories   | ExcludeEmptyDirectories   | Boolean.                                             |
+| BuildPackageProperties                | Properties                | String. Default: Configuration=$(Configuration)      |
+| BuildPackageAdditionalProperties      | Properties                | String.                                              |
+| BuildPackageDetailed                  | Verbosity                 | Boolean.                                             |
+| BuildPackageMinClientVersion          | MinClientVersion          | String. (semver)                                     |
+| BuildPackageMSBuildVersion            | MSBuildVersion            | Number. (4, 12 or 14)                                |
 
 More information: https://docs.nuget.org/consume/command-line-reference#pack-command-options
