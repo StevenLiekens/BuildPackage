@@ -10,19 +10,12 @@ By installing this package into a project, the project build is extended with a 
 # How To
 Install the package directly into the project that must be packaged using the package manager GUI or console.
 
-CMD:
-```
-nuget.exe install BuildPackage
-```
-
 Powershell:
 ```ps
 Install-Package BuildPackage
 ```
 
-Edit the packages.config file to indicate that `NuGet.CommandLine` is not required to run your app by marking it as a `developmentDependency`. (Unless your app *does* depend on NuGet.exe to run, in which case you should ignore this advice)
-
-Do the same thing for `BuildPackage` if your NuGet client didn't set it already.
+Edit the packages.config file to indicate that `NuGet.CommandLine` is not required to run your app by marking it as a `developmentDependency`. Do the same thing for `BuildPackage` if your NuGet client didn't set it already.
 ```xml
 <package id="BuildPackage" version="..." targetFramework="..." developmentDependency="true" />
 <package id="NuGet.CommandLine" version="..." targetFramework="..." developmentDependency="true" />
@@ -35,35 +28,34 @@ The script supports incremental building and cleaning. Packages that are created
 To get the best results, add a customized nuspec file to each project that you will package this way. More information: https://docs.nuget.org/create/nuspec-reference
 
 # Behind the Scenes
-Upon installation, NuGet adds imports for the custom build targets in this package to your project file. The imported targets file contains self-bootstrapping code to ensure that the `BuildPackage` target is executed when you build your project. It does this by extending MSBuild's `BuildDependsOn` property.
+Upon installation, NuGet adds imports for the custom build targets in this package to your project file. The imported targets file contains self-bootstrapping code to ensure that the `BuildPackage` target is executed when you build your project. It does this by extending MSBuild's `PrepareForRunDependsOn` property.
 
 ```xml
-<BuildDependsOn>$(BuildDependsOn);BuildPackage</BuildDependsOn>
+<PrepareForRunDependsOn>$(PrepareForRunDependsOn);BuildPackage</PrepareForRunDependsOn>
 ```
 
 In a typical project, this evaluates to the following sequence of build targets:
- 1. BeforeBuild
- 2. CoreBuild
- 3. AfterBuild
- 4. BuildPackage
+ 1. CopyFilesToOutputDirectory
+ 2. BuildPackage
+ 3. PrepareForRun
 
 The `BuildPackage` target itself depends on three other targets:
  1. BeforeBuildPackage
  2. CoreBuildPackage
  3. AfterBuildPackage
+ 
+The `CoreBuildPackage` target is where the magic happens. Do not override this target! The other targets (BeforeBuildPackage, AfterBuildPackage) are extensibility points that you can override.
 
 ```xml
-<Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
+<Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Condition=" '$(BuildPackage)' == 'True' " />
 <Target Name="CoreBuildPackage">
 ...
 </Target>
 ```
 
-When executed, the `CoreBuildPackage` target finds `NuGet.exe` somewhere in your packages folder, then executes `NuGet.exe pack` on your project file. The other targets (BeforeBuildPackage, AfterBuildPackage) are extensibility points that you can override.
-
-The full command line looks like this:
+When executed, the `CoreBuildPackage` target finds `NuGet.exe` somewhere in your packages folder, then executes `NuGet.exe pack` on your project file. It is smart about which options it should pass to NuGet.exe such as the current build configuration and output directory. The full command line looks like this:
 ```sh
-NuGet.exe pack $(MSBuildProjectFile) -Symbols -IncludeReferencedProjects -OutputDirectory $(OutDir) -Properties Configuration=$(Configuration).
+"C:\src\HelloWorld\packages\NuGet.CommandLine.3.3.0\tools\NuGet.exe" pack "HelloWorld.csproj" -OutputDirectory "bin\Debug\\" -BasePath "bin\Debug\\" -Symbols -IncludeReferencedProjects -Properties Configuration=Debug -NonInteractive
 ```
 
 The output of this command is parsed with a regular expression.
@@ -71,7 +63,7 @@ The output of this command is parsed with a regular expression.
 Successfully created package '(?<package>.+)'.
 ```
 
-For every regex match that is found in the output, a line is added to the FileListAbsolute.txt file to support incremental cleaning.
+For every regex match that is found in the output, a line is added to the `obj\$(MSBuildProjectName).FileListAbsolute.txt` file to support incremental cleaning.
 
 # Limitations
 
@@ -105,13 +97,13 @@ MSBuild:
 You can also set it at the solution level by setting an environment variable or by passing it as a parameter to MSBuild on the command line.
 
 CMD:
-```
+```sh
 SET BuildPackage=False
 MSBuild MySolution.sln
 ```
 
 CMD:
-```
+```sh
 MSBuild MySolution.sln /p:BuildPackage=False
 ```
 
@@ -122,7 +114,7 @@ From docs.nuget.org:
  > If a referenced project has a corresponding nuspec file that has the same name as the project, then that referenced project is added as a dependency. Otherwise, the referenced project is added as part of the package.
  
 ## Organize Package Contents
-You can add a build step that exectutes before building the package. This option was added to support convention based working directories. **This option breaks incremental building and cleaning**.
+You can add a build step that executes before building the package. This option was added to support convention based working directories. **This option breaks incremental building and cleaning**.
 
 MSBuild:
 ```xml
@@ -140,8 +132,6 @@ MSBuild:
 </Target>
 ```
 
-
-
 ## Override Path to NuGet.exe
 The build script will try to find NuGet.exe somewhere in your project's `packages` folder. You can override this behavior by setting an MSBuild variable named `NuGetToolPath`.
 
@@ -153,7 +143,7 @@ MSBuild:
 ```
 
 CMD:
-```
+```sh
 SET NuGetToolPath=C:\bin\NuGet.exe
 msbuild MySolution.sln
 ```
