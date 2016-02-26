@@ -1,8 +1,8 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <BuildDependsOn>$(BuildDependsOn);BuildPackage</BuildDependsOn>
+    <PrepareForRunDependsOn>$(PrepareForRunDependsOn);BuildPackage</PrepareForRunDependsOn>
   </PropertyGroup>
-  <Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Outputs="$(Packages)" Condition=" '$(BuildPackage)' == 'True' " />
+  <Target Name="BuildPackage" DependsOnTargets="$(BuildPackageDependsOn)" Condition=" '$(BuildPackage)' == 'True' " />
   <Target Name="CoreBuildPackage">
     <ItemGroup Condition=" '$(NuGetToolPath)' == '' ">
       <_exe Include="$(MSBuildThisFileDirectory)..\..\NuGet.CommandLine*\tools\NuGet.exe" />
@@ -52,11 +52,7 @@
       <_Pattern><![CDATA[Successfully created package '(?<package>.+)'.]]></_Pattern>
     </PropertyGroup>
     <ItemGroup>
-      <_Matches Include="$([System.Text.RegularExpressions.Regex]::Match('%(_out.Identity)', '$(_Pattern)').Groups['package'].Value)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(_out.Identity)', '$(_Pattern)'))" />
+      <FileWrites Include="$([System.Text.RegularExpressions.Regex]::Match('%(_out.Identity)', '$(_Pattern)').Groups['package'].Value)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(_out.Identity)', '$(_Pattern)'))" />
     </ItemGroup>
-    <PropertyGroup>
-      <Packages>@(_Matches->'%(FullPath)')</Packages>
-    </PropertyGroup>
-    <WriteLinesToFile Lines="$(Packages)" File="$(IntermediateOutputPath)$(CleanFile)" />
   </Target>
 </Project>
