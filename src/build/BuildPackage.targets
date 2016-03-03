@@ -57,7 +57,13 @@
       <_Pattern><![CDATA[Successfully created package '(?<package>.+)'.]]></_Pattern>
     </PropertyGroup>
     <ItemGroup>
-      <FileWrites Include="$([System.Text.RegularExpressions.Regex]::Match('%(_out.Identity)', '$(_Pattern)').Groups['package'].Value)" Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(_out.Identity)', '$(_Pattern)'))" />
+      <BuildPackageOutputs Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(_out.Identity)', '$(_Pattern)'))" Include="$([System.Text.RegularExpressions.Regex]::Match('%(_out.Identity)', '$(_Pattern)').Groups['package'].Value)">
+        <Symbols>False</Symbols>
+        <Symbols Condition="$([System.String]::Copy('%(FileName)').Contains('.symbols.nupkg'))">True</Symbols>
+      </BuildPackageOutputs>
+    </ItemGroup>
+    <ItemGroup>
+      <FileWrites Include="@(BuildPackageOutputs)" />
     </ItemGroup>
   </Target>
 </Project>
