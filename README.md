@@ -63,7 +63,17 @@ The output of this command is parsed with a regular expression.
 Successfully created package '(?<package>.+)'.
 ```
 
-For every regex match that is found in the output, a line is added to the `obj\$(MSBuildProjectName).FileListAbsolute.txt` file to support incremental cleaning.
+An item is added to the `BuildPackageOutputs` item group for every regex match that is found in the output. Additionally, a line is added to the `obj\$(MSBuildProjectName).FileListAbsolute.txt` file to support incremental cleaning.
+
+```xml
+<ItemGroup>
+  <!-- Each item contains the path to a nupkg file -->
+  <BuildPackageOutputs Include=".nupkg">
+    <!-- Boolean metadata indicates whether the package is a symbols package -->
+    <Symbols>True/False</Symbols>
+  </BuildPackageOutputs>
+</ItemGroup>
+```
 
 # Limitations
 
