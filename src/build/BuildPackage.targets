@@ -23,8 +23,6 @@
     <PropertyGroup Condition=" '$(BuildPackageProperties)' == '' ">
       <BuildPackageProperties>Configuration=$(Configuration)</BuildPackageProperties>
       <BuildPackageProperties>$(BuildPackageProperties);Platform=$(Platform)</BuildPackageProperties>
-      <BuildPackageProperties Condition="HasTrailingSlash('$(OutDir)')">$(BuildPackageProperties);OutDir=&quot;$(OutDir)\&quot;</BuildPackageProperties>
-      <BuildPackageProperties Condition="!HasTrailingSlash('$(OutDir)')">$(BuildPackageProperties);OutDir=&quot;$(OutDir)\\&quot;</BuildPackageProperties>
       <BuildPackageProperties Condition=" '$(BuildPackageAdditionalProperties)' != '' ">$(BuildPackageProperties);$(BuildPackageAdditionalProperties)</BuildPackageProperties>
     </PropertyGroup>
     <PropertyGroup>
