@@ -14,7 +14,7 @@
     <releaseNotes>https://github.com/StevenLiekens/BuildPackage/releases/tag/v2.3.0</releaseNotes>
     <copyright>The MIT License (MIT)</copyright>
     <dependencies>
-      <dependency id="NuGet.CommandLine" version="3.4.3" />
+      <dependency id="NuGet.CommandLine" version="3.5.0" />
     </dependencies>
   </metadata>
 </package>
