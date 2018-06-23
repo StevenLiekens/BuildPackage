@@ -47,6 +47,7 @@
       <NugetPackCommand>$(NugetPackCommand) -NonInteractive</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageMinClientVersion)' == 'True' ">$(NugetPackCommand) -MinClientVersion $(BuildPackageMinClientVersion)</NugetPackCommand>
       <NugetPackCommand Condition=" '$(BuildPackageMSBuildVersion)' == 'True' ">$(NugetPackCommand) -MSBuildVersion $(BuildPackageMSBuildVersion)</NugetPackCommand>
+      <NugetPackCommand>$(NugetPackCommand) -ForceEnglishOutput</NugetPackCommand>
     </PropertyGroup>
     <Exec ContinueOnError="ErrorAndContinue" ConsoleToMSBuild="True" Command="$(NugetPackCommand)">
       <Output TaskParameter="ConsoleOutput" ItemName="_out" />
